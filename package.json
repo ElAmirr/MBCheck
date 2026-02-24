@@ -33,7 +33,7 @@
     "appId": "com.elamirr.mbcheck",
     "win": {
       "target": "nsis",
-      "icon": "icon.ico",
+      "icon": "applogo.png",
       "publish": null
     },
     "extraResources": [
@@ -41,7 +41,8 @@
       "mbcheck/**",
       "logs/**",
       "users.json",
-      "logo.svg"
+      "logo.svg",
+      "applogo.png"
     ],
     "files": [
       "**/*",

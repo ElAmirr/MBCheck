@@ -8,7 +8,7 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 1024,
         height: 768,
-        icon: path.join(__dirname, 'icon.ico'),
+        icon: path.join(__dirname, 'applogo.png'),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true
