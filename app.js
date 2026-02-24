@@ -1,6 +1,7 @@
 let users = [];
 let currentUser = null;
 let currentProgram = null;
+let isProcessing = false;
 
 // Electron IPC Communication
 const ipc = typeof window !== 'undefined' && window.require ? window.require('electron').ipcRenderer : null;
@@ -37,23 +38,43 @@ fetch('/api/users')
 
 // ---------- LOGIN ----------
 function login() {
+  if (isProcessing) return;
   const p = password.value;
+  const loginStatus = document.getElementById('loginStatus') || createStatusElement(loginBox);
 
   const user = users.find(x => x.password === p);
   if (!user) {
-    alert('Access denied');
+    showStatus(loginStatus, 'Access Denied', 'error');
     password.value = '';
     password.focus();
     return;
   }
 
+  isProcessing = true;
   currentUser = user;
   loginBox.classList.add('hidden');
   appBox.classList.remove('hidden');
   userInfo.innerHTML = `<span>User: <strong>${user.username}</strong></span> <span>Role: <strong>${user.role}</strong></span>`;
 
+  isProcessing = false;
   // Focus program scan after login
   setTimeout(() => programScan.focus(), 100);
+}
+
+function createStatusElement(parent) {
+  const s = document.createElement('span');
+  s.className = 'status-msg';
+  s.id = parent.id === 'loginBox' ? 'loginStatus' : 'programStatus';
+  parent.appendChild(s);
+  return s;
+}
+
+function showStatus(el, msg, type) {
+  el.innerText = msg;
+  el.className = `status-msg ${type} visible`;
+  setTimeout(() => {
+    el.classList.remove('visible');
+  }, 3000);
 }
 
 // Add Enter listener for login
@@ -100,150 +121,150 @@ function logAction(data) {
 // ---------- PROGRAM SCAN ----------
 programScan.addEventListener('keydown', async (e) => {
   if (e.key !== 'Enter') return;
+  if (isProcessing) return;
 
   pouchSection.innerHTML = '';
   const programBarcode = programScan.value;
   const program = getProgram(programBarcode);
+  const programStatus = document.getElementById('programStatus') || createStatusElement(scanBox);
 
   if (!program) {
-    alert('Program not found');
+    showStatus(programStatus, 'Program Not Found', 'error');
     programScan.value = '';
     programScan.focus();
     return;
   }
 
+  isProcessing = true;
   currentProgram = program;
   scanBox.classList.add('hidden');
 
-  const lines = await loadMBCheck(program);
-  const pouchCount = parseInt(lines[0]);
-  const mask = lines[1];
-  const refs = lines.slice(10).map(r => r.replace('|', ''));
+  try {
+    const lines = await loadMBCheck(program);
+    const pouchCount = parseInt(lines[0]);
+    const mask = lines[1];
+    const refs = lines.slice(10).map(r => r.replace('|', ''));
 
-  pouchSection.innerHTML = `<h3>P${program} – Scan ${pouchCount} pockets</h3>`;
+    pouchSection.innerHTML = `<h3>P${program} – Scan ${pouchCount} pockets</h3>`;
 
-  const allInputs = [];
+    const allInputs = [];
 
-  for (let i = 0; i < pouchCount; i++) {
-    const box = document.createElement('div');
-    box.className = 'pouch-card';
+    for (let i = 0; i < pouchCount; i++) {
+      const box = document.createElement('div');
+      box.className = 'pouch-card';
 
-    const label = document.createElement('h4');
-    label.innerText = `POCKET ${i + 1}`;
+      const label = document.createElement('h4');
+      label.innerText = `POCKET ${i + 1}`;
 
-    const input = document.createElement('input');
-    input.placeholder = 'Scan barcode...';
-    allInputs.push(input);
+      const input = document.createElement('input');
+      input.placeholder = 'Scan barcode...';
+      allInputs.push(input);
 
-    const submitBtn = document.createElement('button');
-    submitBtn.className = 'submit-btn';
-    submitBtn.innerText = 'Submit Change';
+      const submitBtn = document.createElement('button');
+      submitBtn.className = 'submit-btn';
+      submitBtn.innerText = 'Submit Change';
 
-    const statusMsg = document.createElement('span');
-    statusMsg.className = 'status-msg';
+      const statusMsg = document.createElement('span');
+      statusMsg.className = 'status-msg';
 
-    let previousBarcode = '';
+      let previousBarcode = '';
 
-    const performSubmit = async () => {
-      if (currentUser.role === 'operator' && previousBarcode !== '') {
-        alert('No permission to rescan');
-        input.value = previousBarcode;
-        return;
-      }
+      const performSubmit = async () => {
+        if (isProcessing) return;
 
-      let scanned = input.value;
-      if (!scanned) {
-        statusMsg.innerText = 'Enter barcode';
-        statusMsg.className = 'status-msg error visible';
-        input.focus();
-        return;
-      }
+        const isOperator = currentUser.role === 'operator';
+        if (isOperator && previousBarcode !== '') {
+          showStatus(statusMsg, 'No Permission', 'error');
+          input.value = previousBarcode;
+          return;
+        }
 
-      if (scanned.length < 10) {
-        statusMsg.innerText = 'Enter a valid barcode';
-        statusMsg.className = 'status-msg error visible';
-        input.value = '';
-        input.focus();
-        return;
-      }
-      // Take only the first 10 characters as per logic update
-      scanned = scanned.substring(0, 10);
-      input.value = scanned; // Update UI to show truncated version
+        let scanned = input.value;
+        if (!scanned) {
+          showStatus(statusMsg, 'Enter barcode', 'error');
+          input.focus();
+          return;
+        }
 
-      // Update the MBCheck file and log the action via backend
-      try {
-        const response = await fetch('/api/update-barcode', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            program: currentProgram,
-            pouchIndex: i,
-            newBarcode: scanned,
-            oldBarcode: previousBarcode,
-            user: currentUser.username,
-            role: currentUser.role
-          })
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          statusMsg.innerText = 'OK';
-          statusMsg.className = 'status-msg ok visible';
-          const masked = applyMask(scanned, mask);
-          const ok = refs.some(r => masked.includes(r));
-          input.className = ok ? 'ok' : 'nok';
-          previousBarcode = scanned;
-
-          // Lock the pocket: disable input and button
-          input.disabled = true;
-          submitBtn.disabled = true;
-          submitBtn.style.opacity = '0.5';
-          submitBtn.style.cursor = 'not-allowed';
-
-          // Auto-focus next input
-          if (allInputs[i + 1]) {
-            allInputs[i + 1].focus();
-          }
-
-          setTimeout(() => {
-            statusMsg.classList.remove('visible');
-          }, 3000);
-        } else {
-          statusMsg.innerText = 'Error';
-          statusMsg.className = 'status-msg error visible';
-          alert('Error updating barcode: ' + result.error);
+        if (scanned.length < 10) {
+          showStatus(statusMsg, 'Invalid Barcode', 'error');
           input.value = '';
           input.focus();
+          return;
         }
-      } catch (err) {
-        console.error('Failed to communicate with backend:', err);
-        statusMsg.innerText = 'Comm Error';
-        statusMsg.className = 'status-msg error visible';
-        input.value = '';
-        input.focus();
-      }
-    };
 
-    input.addEventListener('focus', () => {
-      input.select();
-    });
+        isProcessing = true;
+        // Take only the first 10 characters
+        scanned = scanned.substring(0, 10);
+        input.value = scanned;
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        performSubmit();
-      }
-    });
+        try {
+          const response = await fetch('/api/update-barcode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              program: currentProgram,
+              pouchIndex: i,
+              newBarcode: scanned,
+              oldBarcode: previousBarcode,
+              user: currentUser.username,
+              role: currentUser.role
+            })
+          });
 
-    submitBtn.addEventListener('click', performSubmit);
+          const result = await response.json();
+          if (result.success) {
+            const masked = applyMask(scanned, mask);
+            const ok = refs.some(r => masked.includes(r));
+            input.className = ok ? 'ok' : 'nok';
 
-    box.append(label, input, submitBtn, statusMsg);
-    pouchSection.appendChild(box);
-  }
+            if (ok) {
+              showStatus(statusMsg, 'OK', 'ok');
+              previousBarcode = scanned;
+              input.disabled = true;
+              submitBtn.disabled = true;
+              submitBtn.style.opacity = '0.5';
 
-  // Focus the first pocket input after generating them
-  if (allInputs[0]) {
-    setTimeout(() => allInputs[0].focus(), 100);
+              if (allInputs[i + 1]) {
+                requestAnimationFrame(() => allInputs[i + 1].focus());
+              }
+            } else {
+              showStatus(statusMsg, 'NOK', 'error');
+              input.value = '';
+              input.focus();
+            }
+          } else {
+            showStatus(statusMsg, 'Save Error', 'error');
+            input.value = '';
+            input.focus();
+          }
+        } catch (err) {
+          console.error(err);
+          showStatus(statusMsg, 'Comm Error', 'error');
+          input.value = '';
+          input.focus();
+        } finally {
+          isProcessing = false;
+        }
+      };
+
+      input.addEventListener('focus', () => input.select());
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') performSubmit(); });
+      submitBtn.addEventListener('click', performSubmit);
+
+      box.append(label, input, submitBtn, statusMsg);
+      pouchSection.appendChild(box);
+    }
+
+    if (allInputs[0]) {
+      setTimeout(() => allInputs[0].focus(), 100);
+    }
+  } catch (err) {
+    console.error(err);
+    showStatus(programStatus, 'File Error', 'error');
+    programScan.value = '';
+    programScan.focus();
+  } finally {
+    isProcessing = false;
   }
 });
