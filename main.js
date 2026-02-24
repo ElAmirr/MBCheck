@@ -13,7 +13,7 @@ function createWindow() {
         frame: false, // Frameless window
         alwaysOnTop: true, // Always stay above other windows
         transparent: true, // Allow transparency for widget look
-        icon: path.join(__dirname, 'applogo.png'),
+        icon: path.join(__dirname, 'logo.png'),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false // Simplified for this implementation

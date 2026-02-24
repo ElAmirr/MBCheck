@@ -42,6 +42,8 @@ function login() {
   const user = users.find(x => x.password === p);
   if (!user) {
     alert('Access denied');
+    password.value = '';
+    password.focus();
     return;
   }
 
@@ -49,7 +51,15 @@ function login() {
   loginBox.classList.add('hidden');
   appBox.classList.remove('hidden');
   userInfo.innerHTML = `<span>User: <strong>${user.username}</strong></span> <span>Role: <strong>${user.role}</strong></span>`;
+
+  // Focus program scan after login
+  setTimeout(() => programScan.focus(), 100);
 }
+
+// Add Enter listener for login
+password.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') login();
+});
 
 // ---------- LOGOUT ----------
 function logout() {
@@ -88,13 +98,17 @@ function logAction(data) {
 }
 
 // ---------- PROGRAM SCAN ----------
-programScan.addEventListener('change', async () => {
+programScan.addEventListener('keydown', async (e) => {
+  if (e.key !== 'Enter') return;
+
   pouchSection.innerHTML = '';
   const programBarcode = programScan.value;
   const program = getProgram(programBarcode);
 
   if (!program) {
     alert('Program not found');
+    programScan.value = '';
+    programScan.focus();
     return;
   }
 
@@ -141,12 +155,15 @@ programScan.addEventListener('change', async () => {
       if (!scanned) {
         statusMsg.innerText = 'Enter barcode';
         statusMsg.className = 'status-msg error visible';
+        input.focus();
         return;
       }
 
       if (scanned.length < 10) {
         statusMsg.innerText = 'Enter a valid barcode';
         statusMsg.className = 'status-msg error visible';
+        input.value = '';
+        input.focus();
         return;
       }
       // Take only the first 10 characters as per logic update
@@ -197,13 +214,21 @@ programScan.addEventListener('change', async () => {
           statusMsg.innerText = 'Error';
           statusMsg.className = 'status-msg error visible';
           alert('Error updating barcode: ' + result.error);
+          input.value = '';
+          input.focus();
         }
       } catch (err) {
         console.error('Failed to communicate with backend:', err);
         statusMsg.innerText = 'Comm Error';
         statusMsg.className = 'status-msg error visible';
+        input.value = '';
+        input.focus();
       }
     };
+
+    input.addEventListener('focus', () => {
+      input.select();
+    });
 
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
