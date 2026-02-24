@@ -2,6 +2,33 @@ let users = [];
 let currentUser = null;
 let currentProgram = null;
 
+// Electron IPC Communication
+const ipc = typeof window !== 'undefined' && window.require ? window.require('electron').ipcRenderer : null;
+
+function shrinkToWidget() {
+  if (ipc) {
+    mainView.classList.add('hidden');
+    titleBar.classList.add('hidden');
+    widgetView.classList.remove('hidden');
+    ipc.send('minimize-to-widget');
+  }
+}
+
+function expandView() {
+  if (ipc) {
+    mainView.classList.remove('hidden');
+    titleBar.classList.remove('hidden');
+    widgetView.classList.add('hidden');
+    ipc.send('expand-to-full');
+  }
+}
+
+function closeApp() {
+  if (ipc) {
+    ipc.send('close-app');
+  }
+}
+
 // ---------- LOAD USERS ----------
 fetch('users.json')
   .then(r => r.json())
