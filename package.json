@@ -32,8 +32,9 @@
   "build": {
     "appId": "com.elamirr.mbcheck",
     "win": {
-      "target": "portable",
-      "icon": "icon.ico"
+      "target": "nsis",
+      "icon": "icon.ico",
+      "publish": null
     },
     "extraResources": [
       "settings.json",

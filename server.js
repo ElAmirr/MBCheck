@@ -16,12 +16,11 @@ let settings = { mbcheckPath: './mbcheck', logsPath: './logs' };
 
 // In Electron packaged app, settings.json and data folders should be in the resources folder
 const isPackaged = process.mainModule && process.mainModule.filename.indexOf('app.asar') !== -1;
-const baseDir = isPackaged
-    ? path.join(process.resourcesPath, '..') // For portable/installed windows apps, resources is usually adjacent
-    : __dirname;
 
-// However, electron-builder puts extraResources in the 'resources' folder directly
-const resourcesPath = isPackaged ? process.resourcesPath : __dirname;
+// electron-builder puts extraResources in the 'resources' folder directly
+const resourcesPath = isPackaged
+    ? (process.platform === 'win32' ? path.join(process.resourcesPath) : process.resourcesPath)
+    : __dirname;
 
 const settingsPath = path.join(resourcesPath, 'settings.json');
 console.log('Checking settings at:', settingsPath);
@@ -33,6 +32,16 @@ if (fs.existsSync(settingsPath)) {
         console.error('Error parsing settings.json:', e);
     }
 }
+
+// Fallback for static assets in packaged environment
+app.use((req, res, next) => {
+    const filePath = path.join(resourcesPath, req.path);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        next();
+    }
+});
 
 // Resolve paths - relative to resourcesPath if not absolute
 const resolveDataPath = (p) => {
@@ -47,7 +56,15 @@ console.log('Using MBCheck directory:', MBCHECK_DIR);
 console.log('Using Logs directory:', LOGS_DIR);
 
 if (!fs.existsSync(LOGS_DIR)) {
-    fs.mkdirSync(LOGS_DIR, { recursive: true });
+    try {
+        fs.mkdirSync(LOGS_DIR, { recursive: true });
+    } catch (e) {
+        console.error('Error creating logs directory:', e);
+    }
+}
+
+if (!fs.existsSync(MBCHECK_DIR)) {
+    console.warn('MBCheck directory does not exist:', MBCHECK_DIR);
 }
 
 if (!fs.existsSync(MBCHECK_DIR)) {
