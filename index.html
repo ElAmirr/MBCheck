@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MBCheck | Industrial Verification</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <img src="logo.svg" alt="Logo" class="logo">
+    <!-- Login Box -->
+    <div id="loginBox" class="box">
+      <h2>Login</h2>
+      <div class="input-group">
+        <label for="password">Access Code</label>
+        <input id="password" type="password" placeholder="Enter access code" autocomplete="current-password">
+      </div>
+      <button onclick="login()">Sign In</button>
+    </div>
+
+    <!-- Main App Box -->
+    <div id="appBox" class="hidden">
+      <div id="userInfo">
+        <!-- Populated by JS -->
+      </div>
+
+      <div id="scanBox" class="box">
+        <h3>Scan Program Barcode</h3>
+        <div class="input-group">
+          <input id="programScan" placeholder="Scan program barcode..." autofocus>
+        </div>
+      </div>
+
+      <div id="pouchSection">
+        <!-- Populated by JS -->
+      </div>
+
+      <button class="secondary" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

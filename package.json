@@ -1,0 +1,52 @@
+{
+  "name": "mbcheck",
+  "version": "1.0.0",
+  "description": "MBCheck",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "server": "node server.js",
+    "dist": "electron-builder --windows"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElAmirr/MBCheck.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ElAmirr/MBCheck/issues"
+  },
+  "homepage": "https://github.com/ElAmirr/MBCheck#readme",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.elamirr.mbcheck",
+    "win": {
+      "target": "portable",
+      "icon": "icon.ico"
+    },
+    "extraResources": [
+      "settings.json",
+      "mbcheck/**",
+      "logs/**",
+      "users.json",
+      "logo.svg"
+    ],
+    "files": [
+      "**/*",
+      "!mbcheck/*",
+      "!logs/*",
+      "!*.exe"
+    ]
+  }
+}

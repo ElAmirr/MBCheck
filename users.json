@@ -1,0 +1,27 @@
+[
+  {
+    "username": "Amir",
+    "password": "$ACC$8935",
+    "role": "process"
+  },
+  {
+    "username": "Hassen",
+    "password": "$ACC$6513",
+    "role": "process"
+  },
+  {
+    "username": "Oussema",
+    "password": "$ACC$8935",
+    "role": "process"
+  },
+  {
+    "username": "Houcem",
+    "password": "$ACC$8935",
+    "role": "process"
+  },
+  {
+    "username": "Sahbi",
+    "password": "$ACC$8935",
+    "role": "process"
+  }
+]

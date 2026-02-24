@@ -1,0 +1,244 @@
+:root {
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --accent-color: #272e9b;
+  --success-color: #16a34a;
+  --error-color: #dc2626;
+  --border-color: #e2e8f0;
+  --input-bg: #ffffff;
+  --transition: all 0.2s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 900px;
+  padding: 0 2rem;
+}
+
+h2,
+h3 {
+  margin-top: 0;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.box {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+#loginBox {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  transition: var(--transition);
+  outline: none;
+}
+
+input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: var(--accent-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+button:hover {
+  background-color: #1e247a;
+  transform: translateY(-1px);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  background-color: var(--accent-color);
+  color: #ffffff;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 0.5rem;
+}
+
+.submit-btn:hover {
+  background-color: #1e247a;
+}
+
+.status-msg {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  min-height: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.status-msg.visible {
+  opacity: 1;
+}
+
+.status-msg.ok {
+  color: var(--success-color);
+}
+
+.status-msg.error {
+  color: var(--error-color);
+}
+
+button.secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  margin-top: 1rem;
+}
+
+button.secondary:hover {
+  background-color: #f1f5f9;
+  color: var(--text-primary);
+  border-color: var(--accent-color);
+}
+
+#userInfo {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+#pouchSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.pouch-card {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pouch-card h4 {
+  margin: 0 0 1rem 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pouch-card input.ok {
+  border-color: var(--success-color);
+  background-color: rgba(34, 197, 94, 0.05);
+}
+
+.pouch-card input.nok {
+  border-color: var(--error-color);
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Scrollbar for modern looks */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
