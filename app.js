@@ -30,9 +30,10 @@ function closeApp() {
 }
 
 // ---------- LOAD USERS ----------
-fetch('users.json')
+fetch('/api/users')
   .then(r => r.json())
-  .then(data => users = data);
+  .then(data => users = data)
+  .catch(err => console.error('Error loading users:', err));
 
 // ---------- LOGIN ----------
 function login() {

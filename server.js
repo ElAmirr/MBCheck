@@ -51,9 +51,11 @@ const resolveDataPath = (p) => {
 
 const MBCHECK_DIR = resolveDataPath(settings.mbcheckPath);
 const LOGS_DIR = resolveDataPath(settings.logsPath);
+const USERS_FILE = resolveDataPath(settings.usersPath || './users.json');
 
 console.log('Using MBCheck directory:', MBCHECK_DIR);
 console.log('Using Logs directory:', LOGS_DIR);
+console.log('Using Users file:', USERS_FILE);
 
 if (!fs.existsSync(LOGS_DIR)) {
     try {
@@ -66,6 +68,21 @@ if (!fs.existsSync(LOGS_DIR)) {
 if (!fs.existsSync(MBCHECK_DIR)) {
     console.warn('MBCheck directory does not exist:', MBCHECK_DIR);
 }
+
+// Endpoint to get users from dynamic path
+app.get('/api/users', (req, res) => {
+    if (fs.existsSync(USERS_FILE)) {
+        try {
+            const data = fs.readFileSync(USERS_FILE, 'utf8');
+            res.json(JSON.parse(data));
+        } catch (e) {
+            console.error('Error reading users file:', e);
+            res.status(500).json({ error: 'Failed to read users file' });
+        }
+    } else {
+        res.status(404).json({ error: 'Users file not found' });
+    }
+});
 
 if (!fs.existsSync(MBCHECK_DIR)) {
     console.warn('MBCheck directory does not exist:', MBCHECK_DIR);

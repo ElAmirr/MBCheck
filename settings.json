@@ -1,4 +1,5 @@
 {
     "mbcheckPath": "./mbcheck",
-    "logsPath": "./logs"
+    "logsPath": "./logs",
+    "usersPath": "./users.json"
 }
