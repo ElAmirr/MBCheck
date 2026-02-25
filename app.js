@@ -3,33 +3,6 @@ let currentUser = null;
 let currentProgram = null;
 let isProcessing = false;
 
-// Electron IPC Communication
-const ipc = typeof window !== 'undefined' && window.require ? window.require('electron').ipcRenderer : null;
-
-function shrinkToWidget() {
-  if (ipc) {
-    mainView.classList.add('hidden');
-    titleBar.classList.add('hidden');
-    widgetView.classList.remove('hidden');
-    ipc.send('minimize-to-widget');
-  }
-}
-
-function expandView() {
-  if (ipc) {
-    mainView.classList.remove('hidden');
-    titleBar.classList.remove('hidden');
-    widgetView.classList.add('hidden');
-    ipc.send('expand-to-full');
-  }
-}
-
-function closeApp() {
-  if (ipc) {
-    ipc.send('close-app');
-  }
-}
-
 // ---------- LOAD USERS ----------
 fetch('/api/users')
   .then(r => r.json())
@@ -95,6 +68,16 @@ function getProgram(barcode) {
   return barcode.substring(11, 14);
 }
 
+// ---------- RESET PROGRAM ----------
+function resetProgram() {
+  currentProgram = null;
+  pouchSection.innerHTML = '';
+  scanBox.classList.remove('hidden');
+  programScan.value = '';
+  isProcessing = false;
+  setTimeout(() => programScan.focus(), 100);
+}
+
 // ---------- LOAD MBCheck FILE ----------
 async function loadMBCheck(program) {
   const res = await fetch(`mbcheck/MBCheck_${program}.txt`);
@@ -145,7 +128,12 @@ programScan.addEventListener('keydown', async (e) => {
     const mask = lines[1];
     const refs = lines.slice(10).map(r => r.replace('|', ''));
 
-    pouchSection.innerHTML = `<h3>P${program} – Scan ${pouchCount} pockets</h3>`;
+    pouchSection.innerHTML = `
+      <div class="section-header">
+        <h3>P${program} – Scan ${pouchCount} pockets</h3>
+        <button class="small-btn" onclick="resetProgram()">Scan New Program</button>
+      </div>
+    `;
 
     const allInputs = [];
 

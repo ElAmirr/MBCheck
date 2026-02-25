@@ -10,20 +10,7 @@
 
 <body>
 
-  <div id="titleBar">
-    <div id="dragRegion">MBCheck</div>
-    <div id="windowControls">
-      <button class="title-btn" onclick="shrinkToWidget()" title="Shrink to Widget">🗗</button>
-      <button class="title-btn close" onclick="closeApp()" title="Close">✕</button>
-    </div>
-  </div>
-
-  <!-- Widget View (Visible when minimized to icon) -->
-  <div id="widgetView" class="hidden" onclick="expandView()">
-    <img src="logo.png" alt="MBCheck Icon">
-  </div>
-
-  <div id="mainView" class="container">
+  <div class="container">
     <img src="logo.svg" alt="Logo" class="logo">
     <!-- Login Box -->
     <div id="loginBox" class="box">

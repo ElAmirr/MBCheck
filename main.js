@@ -1,50 +1,30 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
 // Import and start the server
 require('./server.js');
 
-let mainWindow;
-
 function createWindow() {
-    mainWindow = new BrowserWindow({
+    const win = new BrowserWindow({
         width: 1024,
         height: 768,
-        frame: false, // Frameless window
-        alwaysOnTop: true, // Always stay above other windows
-        transparent: true, // Allow transparency for widget look
         icon: path.join(__dirname, 'logo.png'),
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false // Simplified for this implementation
+            nodeIntegration: false,
+            contextIsolation: true
         }
     });
 
     // Remove the menu bar
-    mainWindow.setMenuBarVisibility(false);
+    win.setMenuBarVisibility(false);
 
     // Load the local server URL
-    mainWindow.loadURL('http://localhost:8000');
+    win.loadURL('http://localhost:8000');
 
-    mainWindow.on('closed', () => {
-        mainWindow = null;
+    win.on('closed', () => {
+        app.quit();
     });
 }
-
-// IPC Handlers for Widget/Full View toggle
-ipcMain.on('minimize-to-widget', () => {
-    mainWindow.setSize(80, 80);
-    mainWindow.setAlwaysOnTop(true);
-});
-
-ipcMain.on('expand-to-full', () => {
-    mainWindow.setSize(1024, 768);
-    mainWindow.center();
-});
-
-ipcMain.on('close-app', () => {
-    app.quit();
-});
 
 app.whenReady().then(createWindow);
 
