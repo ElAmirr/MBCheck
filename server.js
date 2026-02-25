@@ -22,12 +22,7 @@ const resourcesPath = isPackaged
     ? (process.platform === 'win32' ? path.join(process.resourcesPath) : process.resourcesPath)
     : __dirname;
 
-// extraFiles are placed in the app's root folder (next to the .exe)
-const rootPath = isPackaged
-    ? path.dirname(process.execPath)
-    : __dirname;
-
-const settingsPath = path.join(rootPath, 'settings.json');
+const settingsPath = path.join(resourcesPath, 'settings.json');
 console.log('Checking settings at:', settingsPath);
 
 if (fs.existsSync(settingsPath)) {
@@ -48,10 +43,10 @@ app.use((req, res, next) => {
     }
 });
 
-// Resolve paths - relative to rootPath if not absolute
+// Resolve paths - relative to resourcesPath if not absolute
 const resolveDataPath = (p) => {
     if (path.isAbsolute(p)) return p;
-    return path.resolve(rootPath, p);
+    return path.resolve(resourcesPath, p);
 };
 
 const MBCHECK_DIR = resolveDataPath(settings.mbcheckPath);
