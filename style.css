@@ -24,7 +24,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  /* Changed from center to accommodate title bar */
+  /* Correct for title bar */
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -47,7 +47,6 @@ body {
   flex-grow: 1;
   height: 100%;
   -webkit-app-region: drag;
-  /* Makes the title bar draggable */
   display: flex;
   align-items: center;
   padding-left: 1rem;
@@ -76,13 +75,10 @@ body {
   cursor: pointer;
   transition: background 0.2s;
   -webkit-app-region: no-drag;
-  margin: 0;
-  padding: 0;
 }
 
 .title-btn:hover {
   background-color: var(--border-color);
-  transform: none;
 }
 
 .title-btn.close:hover {
@@ -124,7 +120,7 @@ body {
   width: 100%;
   max-width: 900px;
   padding: 4rem 2rem 2rem 2rem;
-  /* Top padding for title bar */
+  /* Buffer for title bar */
 }
 
 h2,

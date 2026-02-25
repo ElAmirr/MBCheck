@@ -119,7 +119,8 @@ app.post('/api/update-barcode', (req, res) => {
         }
 
         const previousLineValue = lines[lineIndex];
-        lines[lineIndex] = newBarcode + '|';
+        const truncatedBarcode = newBarcode.substring(0, 10);
+        lines[lineIndex] = truncatedBarcode + '|';
 
         fs.writeFileSync(filePath, lines.join('\n'));
 

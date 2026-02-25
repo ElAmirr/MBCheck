@@ -194,7 +194,7 @@ programScan.addEventListener('keydown', async (e) => {
         }
 
         isProcessing = true;
-        // Take only the first 10 characters
+        // Strict 10-character truncation
         scanned = scanned.substring(0, 10);
         input.value = scanned;
 
@@ -214,24 +214,18 @@ programScan.addEventListener('keydown', async (e) => {
 
           const result = await response.json();
           if (result.success) {
-            const masked = applyMask(scanned, mask);
-            const ok = refs.some(r => masked.includes(r));
-            input.className = ok ? 'ok' : 'nok';
+            // Trust backend success for OK status
+            input.className = 'ok';
+            showStatus(statusMsg, 'OK', 'ok');
+            previousBarcode = scanned;
 
-            if (ok) {
-              showStatus(statusMsg, 'OK', 'ok');
-              previousBarcode = scanned;
-              input.disabled = true;
-              submitBtn.disabled = true;
-              submitBtn.style.opacity = '0.5';
+            // Lock the pocket
+            input.disabled = true;
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.5';
 
-              if (allInputs[i + 1]) {
-                requestAnimationFrame(() => allInputs[i + 1].focus());
-              }
-            } else {
-              showStatus(statusMsg, 'NOK', 'error');
-              input.value = '';
-              input.focus();
+            if (allInputs[i + 1]) {
+              requestAnimationFrame(() => allInputs[i + 1].focus());
             }
           } else {
             showStatus(statusMsg, 'Save Error', 'error');
@@ -268,3 +262,10 @@ programScan.addEventListener('keydown', async (e) => {
     isProcessing = false;
   }
 });
+
+// Initial focus for login
+window.onload = () => {
+  if (!password.classList.contains('hidden')) {
+    password.focus();
+  }
+};
