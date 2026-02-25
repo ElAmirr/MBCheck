@@ -37,12 +37,14 @@
       "publish": null
     },
     "extraResources": [
+      "logo.svg",
+      "logo.png"
+    ],
+    "extraFiles": [
       "settings.json",
       "mbcheck/**",
       "logs/**",
-      "users.json",
-      "logo.svg",
-      "logo.png"
+      "users.json"
     ],
     "files": [
       "**/*",
