@@ -80,7 +80,8 @@ function resetProgram() {
 
 // ---------- LOAD MBCheck FILE ----------
 async function loadMBCheck(program) {
-  const res = await fetch(`mbcheck/MBCheck_${program}.txt`);
+  const res = await fetch(`/api/mbcheck/${program}`);
+  if (!res.ok) throw new Error('Program not found');
   const txt = await res.text();
   return txt.split('\n').map(l => l.trim());
 }

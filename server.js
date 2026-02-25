@@ -84,6 +84,30 @@ app.get('/api/users', (req, res) => {
     }
 });
 
+// Endpoint to read MBCheck program file from external path
+app.get('/api/mbcheck/:program', (req, res) => {
+    const program = req.params.program;
+    // Basic validation: only alphanumeric
+    if (!/^\w+$/.test(program)) {
+        return res.status(400).json({ error: 'Invalid program ID' });
+    }
+
+    const filePath = path.join(MBCHECK_DIR, `MBCheck_${program}.txt`);
+
+    if (fs.existsSync(filePath)) {
+        try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            res.send(content);
+        } catch (e) {
+            console.error('Error reading mbcheck file:', e);
+            res.status(500).json({ error: 'Failed to read program file' });
+        }
+    } else {
+        res.status(404).json({ error: 'Program file not found' });
+    }
+});
+
+
 if (!fs.existsSync(MBCHECK_DIR)) {
     console.warn('MBCheck directory does not exist:', MBCHECK_DIR);
 }
